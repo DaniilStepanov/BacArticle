@@ -1,0 +1,18 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Borealis basics}\label{sec:basics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This work is based on Borealis bounded model checker~\cite{Borealis}, which used for C programming language. A large-scale overview of Borealis is shown in figure~\ref{fig:borealis-scheme}.
+
+\begin{figure}[tbh]
+\centering
+\caption{High-level scheme of Borealis bounded model checker}
+\label{fig:borealis-scheme}
+\includegraphics[width=\linewidth]{BorealisOverview}
+\end{figure}
+
+Borealis based on LLVM \cite{LLVM} framework, it works by converting a program representation to SMT formulae, which is then checked for possible satisfiability. Borealis uses its own program representation named Predicate State~(PS). PS for given LLVM instruction corresponds to SMT formulae, which describes all possible program states in this instruction. PS for a given LLVM~IR instruction corresponds to an SMT formula, which describes all possible program states at this instruction. A simplified description of PS format is shown in figure~\ref{fig:predicate-state}.
+
+\input{fig/predicate-state}
+
+Functions approximations can be hand-crafted by the user in the form of source code or external annotations or external tools for component description. Also approximations can be extracted from source code using Craig interpolation or dynamic analyses. In this work we represented yet another approach to function approximation based on extraction from source code.

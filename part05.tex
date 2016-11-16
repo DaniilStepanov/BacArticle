@@ -1,0 +1,27 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Related work}\label{sec:related-work}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+There already exsits a large body of work on function summarization. It can be roughly divided in two parts: approaches based on software mining and on static analysis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Software mining}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A lot of approaches to function summarization are based on different flavours of software mining~\cite{Perracotta,Daikon,AssertsFromTraces,PredicateMining,AutomataMining}. Many of the works are based on dynamic techniques, i.e., summarization is done using the information collected during program execution. For example, in~\cite{Perracotta} the authors propose to collect execution traces during testing and infer interesting properties from them. As the traces are often partial~(due to the peculiarities of test development), the algorithm is reinforced with property template inference, which accounts for incomplete traces. The authors of~\cite{Daikon} tackle the same problem from a different angle~--- traces are summarized using a machine learning technique, based on a generate-and-check loop. Their approach has also been successfully extended to concurrent and distributed systems~\cite{CSight}.
+
+Despite all the advantages of dynamic techniques, they all share one critical flaw~--- they need to run the program~--- which makes them ill-suited for use in program static analysis. A number of static approaches to summarization have been developed to overcome this~\cite{PredicateMining,AutomataMining}.
+
+As mentioned before, our approach is most similar to~\cite{PredicateMining}, which also collects different control- and dataflow predicates from the source code. These predicates are then summarized using frequent subset and sequence mining to create the function specification. Our approach differs in that it employs the capabilities of modern SMT solvers for summarization, to make the resulting contracts more succinct and precise; for another thing, it is limited to dataflow predicates, as we still working on how to embed control-flow predicates in the BMC setting. The work of~\cite{AutomataMining} is also similar to~\cite{PredicateMining}, but is built upon automata abstractions, which are used to summarize possible control-flow predicates in an efficient way. Dual to our approach, this work targets only temporal control-flow predicates, as they go best with automata-based abstractions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Static analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+There are several ways static analysis can be used in fuction summarization. A number of approaches are based on different kinds of predicate abstraction~\cite{PredAbs}~--- a technique where predicates are constructed on-the-go and refined as the analysis explores the program, i.e., the set of predicates may change depending on the analyzed property. In~\cite{CegarPrecondition} counterexample-guided abstraction refinement~(CEGAR~\cite{CEGAR}) is used to find a function contract, by iteratively refining the program state until a sufficient precondition is found. Other approaches use classic Hoare logic and infer the needed function safety conditions in this framework~\cite{BarnettLeino}.
+
+Some approaches employ bi-abduction~\cite{BiAbduction}, a very powerful technique which answers the following question: for some given $E$ and $B$, find $AF$ and $F$ such that $E \land AF \implies B \land F$. If we fix~$E$ to be the environment and~$B$ to be the function called, formula~$AF$ gives us exactly the contract for~$B$ w.r.t~$E$. An advantage of this technique is that function summarization can be done on a per-call-site basis, thus greatly increasing its precision. An example of this technique is~\cite{MaxSpecSynth}, where it is successfully used to create function summaries for all unknown functions in a given program.
+
+The interpolation approaches to function summarization are founded on Craig interpolation~\cite{CraigInMC}, which allows one to find an intermediate formulae~$I$%
+\footnote{called Craig interpolant}
+for~$B \implies Q$, such that~$B \implies I$ and $I \implies Q$. This interpolant summarizes a function w.r.t. some property of interest, if we take the function body as~$B$ and our safety property as~$Q$. This idea has been explored in~\cite{FunSum}, where Craig interpolation is used for function summarization in the classic BMC setting. It allows one to greatly reduce the size of the resulting SMT formulae, thus increasing the analysis performance. The original idea of interpolation in BMC was introduced in~\cite{CraigInMC} and~\cite{LazyAbs}, to make BMC applicable to infinite-state programs, by exploiting its [Craig interpolation] generalization power. This technique is very powerful, and we may consider augmenting our approach with it.

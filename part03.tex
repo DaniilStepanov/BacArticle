@@ -1,0 +1,123 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Contract summarization}\label{sec:summarization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To create a contract for a given function~$f$, we need to summarize all interesting predicates mined previously for~$f$. Let~$P$ be a set of unique predicates found for~$f$, $N$ be a mapping from predicates to their counts of occurencies. We summarize~$P$ and~$N$ into a contract in the following steps:
+%
+\begin{itemize*}
+\item Unsatisfiable core pruning
+\item Predicate weakening
+\item Frequent predicate collection
+\end{itemize*}
+%
+Let us describe these steps in more detail.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unsatisfiable core pruning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Set~$P$ might contain predicates which contradict each other. There are two possible reasons for this: either these predicates do not form a precondition for~$f$, or one of these predicates is a programmer's error. Unfortunately, there is no easy way of differentiating between these options; in our approach we decided to prune such predicates.
+
+A naive approach to pruning would be to pairwise compare the predicates to find all contradictory pairs; however, this takes $O(|P|^2)$ calls to an SMT solver and, therefore, is very time-consuming. To speed-up the pruning, we use \emph{unsatisfiable cores}~--- minimal subsets of predicates whose conjunctions are unsatisfiable~--- as they are easily obtainable from an SMT solver. An outline of unsatisfiable core pruning is shown in algorithm~\ref{fig:unsat-core-pruning}.
+
+\begin{algorithm}[tbh]
+\caption{Unsatisfiable core pruning}
+\label{fig:unsat-core-pruning}
+
+\textbf{Input:}  $P$ --- set of unique predicates\\
+\textbf{Output:} $P$ --- set of unsat-pruned unique predicates
+
+\begin{algorithmic}[1]
+
+\State $UnsatCores \leftarrow \emptyset$
+
+\While {$true$} \label{line:pruning-step-1-start}
+    \State $UC \leftarrow getUnsatCore(P)$
+    \If {$UC = \emptyset$}
+        \State \textbf{break}
+    \EndIf
+    \State $UnsatCores \leftarrow UnsatCores \cup UC$
+    \ForAll {$p \in UC$}
+        \State $P \leftarrow P \backslash p$
+    \EndFor
+\EndWhile \label{line:pruning-step-1-end}
+
+\ForAll {$uc \in UnsatCores$} \label{line:pruning-step-2-start}
+    \State $UC \leftarrow getUnsatCore(P \cup \{uc\})$
+    \State $UnsatCores \leftarrow UnsatCores \cup UC$
+    \ForAll {$p \in UC$}
+        \State $P \leftarrow P \backslash p$
+    \EndFor
+\EndFor \label{line:pruning-step-2-end}
+\end{algorithmic}
+\end{algorithm}
+
+Unsatisfiable core pruning consists of two steps. The first step~(lines~\ref{line:pruning-step-1-start}--\ref{line:pruning-step-1-end}) collects the maximal subset $UnsatCores$ of unsatisfiable predicates via several calls to $getUnsatCore$. The second step~(lines~\ref{line:pruning-step-2-start}--\ref{line:pruning-step-2-end}) reinforces $UnsatCores$ with other contradictory predicates by finding additional unsatisfiable cores of~$P$ w.r.t. predicates from $UnsatCores$. After pruning, set~$P$ contains only non-contradictory predicates, which can be viewed as a raw contract for~$f$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Predicate weakening}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A set~$P$ of non-contradictory predicates can be simplified by extracting a subset of weakest predicates%
+\footnote{as we are interested in [weakest] preconditions}.
+We consider the classic definition of weakest precondition~--- $p$ is weaker than~$q$, if~$q \implies p$. This check is implemented~(yet again) by employing an SMT solver; if~$\overline{q \implies p}$ is unsatisfiable, $q \implies p$ always holds, i.e., $p$ is weaker than~$q$. Algorithm~\ref{fig:predicate-weakening} shows the predicate weakening process.
+
+\begin{algorithm}[tbh]
+
+\caption{Predicate weakening}
+\label{fig:predicate-weakening}
+
+\textbf{Input:}  $P$ --- set of unique predicates\\
+\textbf{Input:}  $N$ --- mapping from predicates to counts\\
+\textbf{Output:} $P$ --- set of weakest predicates\\
+\textbf{Output:} $N$ --- updated mapping
+
+\begin{algorithmic}
+\ForAll {$p, q \in P \times P : p \neq q$}
+    \If {$isWeaker(p, q)$}
+        \State $P \leftarrow P \backslash p$
+        \State $N(p) \leftarrow N(p) + N(q)$
+    \EndIf
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Frequent predicate collection}\label{sec:predicate-collection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+After collecting the weakest predicates for our function~$f$, we are prepared for the final step in contract summarization. As traditionally adopted in specification mining, we filter out predicates unusual w.r.t. the analyzed software, i.e., predicates infrequently encountered in the source code. The algorithm is shown in~\ref{fig:predicate-collection}.
+
+\begin{algorithm}[tbh]
+
+\caption{Frequent predicate collection}
+\label{fig:predicate-collection}
+
+\textbf{Param:} $K$ --- allowed percentage $0 \le K \le 1$\\
+\textbf{Param:} $X$ --- allowed number of occurences $0 \le X$\\
+\textbf{Input:} $P$ --- set of weakest predicates\\
+\textbf{Input:} $N$ --- mapping from predicates to counts\\
+\textbf{Input:} $T$ --- total number of occurences
+
+\textbf{Output:} $C$ --- function contract
+
+\begin{algorithmic}
+
+\State $C \leftarrow \emptyset$
+
+\If {$X > T$}
+    \State \Return
+\EndIf
+
+\ForAll {$p \in P$}
+    \If {$K \le N(p)/T$}
+        \State $C \leftarrow C \cup {p}$
+    \EndIf
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+
+Our algorithm is parametric in the minimal number~$X$ and percentage~$K$ of predicate occurences. By changing these parameters, we can~(to some degree) control the precision and recall of our contract mining. If $K \rightarrow 1$, the balance is shifted towards precision, as we consider a condition to be a contract only if it is encountered very frequently w.r.t. function calls. In the opposite case of $K \rightarrow 0$, we greatly increase the recall of our approach, but the probability of mining an erroneous contract is also higher~(as we might capture a programmer's error as a required precondition). Parameter~$X$ has similar properties, but in the space of absolute~(versus relative) values of the number of occurences.
+
+To get the optimal results, one needs to find a good balance between these two parameters. However, at the moment we consider this problem as our future work.
