@@ -1,14 +1,32 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Predicate mining}\label{sec:mining}
+\section{Function approximation}\label{sec:mining}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The overall algorithm of function approximation is show in figure~\ref{fig:approxAlg}
+The overall algorithm of function approximation is shown in figure~\ref{fig:approxAlg}
 \begin{figure}[H]
 \centering
 \caption{Function approximation scheme}
 \label{fig:approxAlg}
 \includegraphics[keepaspectratio, width=\linewidth, height=8cm]{approxAlg}
 \end{figure}
+
+
+\subsection{Predicate State simplify}
+At the beginning we must simplify predicate state, because LLVM uses static single assignment form (SSA), what complicates approximation. There are 2 simplify rules:
+\begin{itemize}
+\item if right side of current predicate equal or contained in left side of previous predicate, then we replace right side of current predicate by right side of previous;
+\item for path predicates always replace value in condition by what was previously assigned
+\end{itemize} 
+An example of PS simplifying is shown in figure~\ref{fig:simEx}
+
+
+\subsection{Determine approximate variables}
+After simplifying we must to decide over which variables we will be approximate. In this work we decide to approximate over variables, which lead return values to constants. These variables are in path predicates on one of the branches which assigned the return value to the constant. This is done using algorithm~\ref{alg:lol}.
+
+\subsection{Deleting excess parts of PS}
+After determining approximate variables we need to extract parts of predicate state, which have influence on approximate variables. For this, first we must to traverse direct acyclic graph~(DAG) of program until we meet path predicate, which chose on previous step. Next we perfome reverse traverse with saving all code pieces.
+
+For that algorithm we developed a mechanism of DAG traverse, which can consider all predicate state and it's distinct parts in direct and reverse order. After extracting we must to simplify predicate state by deleting unused global variables and empty constructions.
 
 
 In this work we focus on dataflow predicates, specifically, on predicates corresponding to conditional statements over function arguments. The premise is that, if a condition checks an argument before a function call, this condition may capture an interesting precondition of this function.

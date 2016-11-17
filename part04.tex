@@ -2,7 +2,29 @@
 \section{Evaluation}\label{sec:evaluation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-We implemented our approach as a plugin for Borealis bounded model checker and conducted some preliminary evaluation. We were interested in three kinds of datum: how many contracts we have mined, how good these contracts are and what influence they have on~BMC.
+We implemented our approach as a plugin for Borealis bounded model checker and conducted some preliminary evaluation. We interested in three kinds of results: number of finding bugs and time of analyzing. We launched the project in 3 modes: with summaries, without interprocedural analyzis and with inlining.
+
+\begin{table}[h]
+\caption{\label{tab:test} Testing statistics}
+\begin{tabular}{| c | c | c | c | c | c | c | c | c | c | c |}
+\hline
+\multirow{2}{*}{\bf Project} & \multicolumn{3}{|c|}{ \bf Time} & \multicolumn{3}{|c|}{\bf Defect} & \multicolumn{3}{|c|}{\bf No Defect}\\
+\cline{2-10}
+ & --- & sum &  inline & --- & sum &  inline & --- & sum &  inline \\
+\hline
+Sil_Sear  & 00:03 & \textcolor[rgb]{0,0.4,0}{00:04} &  00:07 & 69 &  \textcolor[rgb]{0,0.4,0}{66} &  65  & 16 &  28 &  29\\
+\hline
+Glove  & 06:00 & 06:00 &  16:00 & 143 & 142 & 98 & 128 & 126 & 226  \\
+\hline
+C4 &   21:41 & \textcolor[rgb]{0,0.4,0}{22:01} & --- & 78 & \textcolor[rgb]{0,0.4,0}{74} & --- & 480 & 484 & ---  \\
+\hline
+KCP  & 12:35 & 10:11 &  11:51  & 277 & 269 & 251 & 150 & 150 & 182 \\
+\hline
+Progress & 1:39 & \textcolor[rgb]{0,0.4,0}{44:42} & 5:09:34 & 61 & \textcolor[rgb]{0,0.4,0}{52} & 48 & 194 & 165 & 163 \\
+\hline
+\end{tabular}
+\end{table}
+
 
 As discussed in section~\ref{sec:predicate-collection}, our algorithm has two tunable parameters, $K$ and $X$. We decided to select the values biased towards precision: $K = 0.68$, $X = 3$.
 
