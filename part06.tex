@@ -1,9 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusion}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In this paper we presented an approach to function approximation for use in BMC tools. The basis of the proposed method is to extract approximations of functions relatively to the pre-selected variables, which assign the return value of the function to a constant. Prototype plugin for Borealis BMC tool was implemented and has been evaluated on many programs. The evaluations results are showed that our approach is able to give a correct approximations and they have some positive effect on the analysis process.
 
-In this paper we presented an approach to automatic contract mining for use in BMC tools. By embedding the mining problem into the BMC and exploiting the power of modern SMT solvers, our approach is able to extract succinct function contracts. The parametric nature allows one to vary the precision-recall tradeoff on a per-project basis.
-
-We implemented the proposed approach in a prototype plugin for Borealis BMC tool and did some preliminary evaluation. The evaluation results show our approach to be applicable to real software and to improve the~BMC results.
-
-There are several things we would like to consider in our future work. First, we want to do a more extensive and thorough evaluation of our approach, and to also analyze its influence on the quality of BMC results in more detail. Second, we would like to try automating parameter selection via some flavour of computer-aided optimization, and to study their effect on precision and recall. Third, predicate pruning can be amplified to do a more in-depth analysis of unsatisfiable cores, resulting in increased pruning precision. It could also be improved by considering predicates in a per-call-site fashion, thus improving pruning granularity.
+In future work we want expand the range of extracting approximations. We can approximate functions relativity to the arguments, sending in function by pointers. Final objective is approximation relativity to side where we are looking for bug.

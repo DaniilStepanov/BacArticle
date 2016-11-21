@@ -1027,31 +1027,18 @@
 %%% caption).
 %%%
 \newtoks\copyrightnotice
-\def\ftype@copyrightbox{8}
+\def\ftype@copyrightbox{0}
 \def\@copyrightspace{
 \@float{copyrightbox}[b]
 \begin{center}
-\setlength{\unitlength}{1pc}
-\ifnum\ACM@basesize=9
-\begin{picture}(20,6) %Space for copyright notice
-\put(0,-0.95){\crnotice{\@toappear}}
-\end{picture}
+\setlength{\unitlength}{0pc}
+\ifnum\ACM@basesize=0
 \fi
-\ifnum\ACM@basesize=10
-\begin{picture}(20,7) %Space for copyright notice
-\put(0,-0.95){\crnotice{\@toappear}}
-\end{picture}
+\ifnum\ACM@basesize=0
 \fi
 \end{center}
 \end@float}
 
-\def\@toappear{} % Default setting blank - commands below change this.
-\long\def\toappear#1{\def\@toappear{\parbox[b]{20pc}{\baselineskip 9pt#1}}}
-\def\toappearbox#1{\def\@toappear{\raisebox{5pt}{\framebox[20pc]{\parbox[b]{19pc}{#1}}}}}
-
-\newtoks\conf
-\newtoks\confinfo
-\def\conferenceinfo#1#2{\global\conf={#1}\global\confinfo{#2}}
 
 
 %\def\marginpar{\@latexerr{The \marginpar command is not allowed in the
@@ -1067,34 +1054,6 @@
   January\or February\or March\or April\or May\or June\or
   July\or August\or September\or October\or November\or December\fi
   \space\number\day, \number\year}
-
-\def\@begintheorem#1#2{%
-    \parskip 0pt % GM July 2000 (for tighter spacing)
-    \trivlist
-    \item[%
-        \hskip 10\p@
-        \hskip \labelsep
-        {{\sc #1}\hskip 5\p@\relax#2.}%
-    ]
-    \it
-}
-\def\@opargbegintheorem#1#2#3{%
-    \parskip 0pt % GM July 2000 (for tighter spacing)
-    \trivlist
-    \item[%
-        \hskip 10\p@
-        \hskip \labelsep
-        {\sc #1\ #2\             % This mod by Gerry to enumerate corollaries
-   \setbox\@tempboxa\hbox{(#3)}  % and bracket the 'corollary title'
-        \ifdim \wd\@tempboxa>\z@ % and retain the correct numbering of e.g. theorems
-            \hskip 5\p@\relax    % if they occur 'around' said corollaries.
-            \box\@tempboxa       % Gerry - Nov. 1999.
-        \fi.}%
-    ]
-    \it
-}
-\newif\if@qeded
-\global\@qededfalse
 
 % -- original
 %\def\proof{%
@@ -1118,7 +1077,7 @@
 \def\@proof{%
     \trivlist
     \item[%
-        \hskip 10\p@
+        \hskip 0\p@
         \hskip \labelsep
         {\sc Proof.}%
     ]
@@ -1126,7 +1085,7 @@
 }
 \def\@xproof[#1]{%
     \trivlist
-    \item[\hskip 10\p@\hskip \labelsep{\sc Proof #1.}]%
+    \item[\hskip 0\p@\hskip \labelsep{\sc Proof #1.}]%
     \ignorespaces
 }
 \def\qed{%
@@ -1135,7 +1094,7 @@
     \begingroup
         \unitlength\p@
         \linethickness{.4\p@}%
-        \framebox(6,6){}%
+        \framebox(0,0){}%
     \endgroup
     \global\@qededtrue
 }
@@ -1614,70 +1573,7 @@
 \flushbottom           % Even bottom -- alas, does not balance columns at end of document
 \pagestyle{plain}
 
-% Need Copyright Year and Copyright Data to be user definable (in .tex file).
-% Gerry Nov. 30th. 1999
-\newtoks\copyrtyr
-\newtoks\acmcopyr
-\newtoks\boilerplate
-\global\acmcopyr={X-XXXXX-XX-X/XX/XX}  % Default - 5/11/2001 *** Gerry
-\global\copyrtyr={\the\year}                % Default - 3/3/2003 *** Gerry
-\def\acmPrice#1{\gdef\@acmPrice{#1}}
-\acmPrice{} %article price  % Changed to 15 - June 2012 - Gerry
 
-
-\def\CopyrightYear#1{\global\copyrtyr{#1}}
-\def\crdata#1{\global\acmcopyr{#1}}
-\def\permission#1{\global\boilerplate{#1}}
-
-% ISBN
-%
-\def\isbn#1{\global\acmcopyr={#1}}
-\isbn{978-1-4503-2138-9}
-
-\RequirePackage{url}
-\urlstyle{rm}
-\def\doi#1{\def\@doi{#1}}
-\doi{10.1145/1235}
-\def\printdoi#1{\url{#1}}
-
-
-
-% Copyright
-\RequirePackage{acmcopyright}
-\setcopyright{none}
-
-%
-\global\boilerplate={\@copyrightpermission}
-
-
-
-\newtoks\copyrightetc
-\ifnum\ACM@basesize=9\relax
-\global\copyrightetc{%
-{\noindent\confname\ \the\conf\ \the\confinfo}\par\smallskip
-  \if@printcopyright
-    \copyright\ \the\copyrtyr\ \@copyrightowner
-  \fi
-  \if@acmowned ISBN \else\ifnum\acm@copyrightmode=2 ISBN \else \par\smallskip ACM ISBN \fi\fi
- \the\acmcopyr\ifx\@acmPrice\@empty.\else\dots\@acmPrice\fi\par\smallskip
-{DOI: \small\expandafter\printdoi\expandafter{\@doi}}} 
-\toappear{\fontsize{7pt}{8pt}\fontfamily{ptm}\selectfont
-  \the\boilerplate\par\smallskip
- \the\copyrightetc}
-\fi
-\ifnum\ACM@basesize=10\relax
-\global\copyrightetc{%
-{\noindent\confname\ \the\conf\ \the\confinfo}\par\smallskip
-  \if@printcopyright
-    \copyright\ \the\copyrtyr\ \@copyrightowner
-  \fi
-  \if@acmowned ISBN \else\ifnum\acm@copyrightmode=2 ISBN \else \par\smallskip ACM ISBN \fi\fi
- \the\acmcopyr\ifx\@acmPrice\@empty.\else\dots\@acmPrice\fi\par\smallskip
-{DOI: \small\expandafter\printdoi\expandafter{\@doi}}} 
-\toappear{\fontsize{7.5pt}{8.5pt}\fontfamily{ptm}\selectfont
-  \the\boilerplate\par\smallskip
- \the\copyrightetc}
-\fi
 %\DeclareFixedFont{\altcrnotice}{OT1}{tmr}{m}{n}{8}  % << patch needed for accenting e.g. Montreal - Gerry, May 2007
 %\DeclareFixedFont{\altconfname}{OT1}{tmr}{m}{it}{8}  % << patch needed for accenting in italicized confname - Gerry, May 2007
 %
@@ -1807,87 +1703,10 @@
 
 % The following command will be compared to \frenchname,
 % as defined in french.sty and frenchle.sty.
-\def\aeguillfrenchdefault{french}%
 
-\let\guill@verbatim@font\verbatim@font
-\def\verbatim@font{\guill@verbatim@font\ecguills{cmtt}%
-                   \let\guillemotleft\@oguills\let\guillemotright\@fguills}
-
-\begingroup \catcode`\<=13 \catcode`\>=13
-\def\x{\endgroup
- \def\ae@lfguill{<<}%
- \def\ae@rfguill{>>}%
-}\x
-
-\newcommand{\ecguills}[1]{%
-  \def\selectguillfont{\fontencoding{T1}\fontfamily{#1}\selectfont}%
-  \def\@oguills{{\selectguillfont\symbol{19}}}%
-  \def\@fguills{{\selectguillfont\symbol{20}}}%
-  } 
-
-\newcommand{\aeguills}{%
-  \ae@guills
-  % We redefine \guillemotleft and \guillemotright
-  % in order to catch them when they are used 
-  % with \DeclareInputText (in latin1.def for instance)
-  % We use \auxWARNINGi as a safe indicator that french.sty is used.
-  \gdef\guillemotleft{\ifx\auxWARNINGi\undefined
-                         \@oguills % neither french.sty nor frenchle.sty
-                      \else
-                         \ifx\aeguillfrenchdefault\frenchname
-                           \ae@lfguill  % french.sty
-                         \else
-                           \@oguills    % frenchle.sty
-                         \fi
-                      \fi}%
-  \gdef\guillemotright{\ifx\auxWARNINGi\undefined
-                         \@fguills % neither french.sty nor frenchle.sty
-                       \else
-                         \ifx\aeguillfrenchdefault\frenchname
-                           \ae@rfguill  % french.sty
-                         \else
-                           \@fguills    % frenchle.sty
-                         \fi
-                       \fi}%
-  }
 
 %
 % Depending on the class option
 % define the internal command \ae@guills
-\@ae@switch{% ec
-  \newcommand{\ae@guills}{%
-    \ecguills{cmr}}%
-}{% cm
-  \newcommand{\ae@guills}{%
-    \def\selectguillfont{\fontencoding{U}\fontfamily{lasy}%
-            \fontseries{m}\fontshape{n}\selectfont}%
-    \def\@oguills{\leavevmode\nobreak
-                \hbox{\selectguillfont (\kern-.20em(\kern.20em}\nobreak}%
-    \def\@fguills{\leavevmode\nobreak
-                \hbox{\selectguillfont \kern.20em)\kern-.2em)}%
-                \ifdim\fontdimen\@ne\font>\z@\/\fi}}%
-}{% cyr
-  \newcommand{\ae@guills}{%
-    \def\selectguillfont{\fontencoding{OT2}\fontfamily{wncyr}\selectfont}%
-    \def\@oguills{{\selectguillfont\symbol{60}}}%
-    \def\@fguills{{\selectguillfont\symbol{62}}}}
-}{% pl
-  \newcommand{\ae@guills}{%
-    \def\selectguillfont{\fontencoding{OT4}\fontfamily{cmr}\selectfont}%
-    \def\@oguills{{\selectguillfont\symbol{174}}}%
-    \def\@fguills{{\selectguillfont\symbol{175}}}}
-}
-
-
-\AtBeginDocument{%
-  \ifx\GOfrench\undefined
-    \aeguills
-  \else
-    \let\aeguill@GOfrench\GOfrench
-    \gdef\GOfrench{\aeguill@GOfrench \aeguills}%
-  \fi
-  }
-
-\endinput
 %
 
