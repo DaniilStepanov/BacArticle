@@ -2,7 +2,7 @@
 \section{Contract summarization}\label{sec:summarization}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-To create a contract for a given function~$f$, we need to summarize all interesting predicates mined previously for~$f$. Let~$P$ be a set of unique predicates found for~$f$, $N$ be a mapping from predicates to their counts of occurencies. We summarize~$P$ and~$N$ into a contract in the following steps:
+To create a contract for a given function~$f$, we need to summarize all interesting predicates mined previously for~$f$. Let~$P$ be a set of unique predicates found for~$f$, $N$ be a mapping from predicates to their counts of occurrences. We summarize~$P$ and~$N$ into a contract in the following steps:
 %
 \begin{itemize*}
 \item Unsatisfiable core pruning
@@ -10,7 +10,7 @@ To create a contract for a given function~$f$, we need to summarize all interest
 \item Frequent predicate collection
 \end{itemize*}
 %
-Let us describe these steps in more detail.
+These steps are described more precisely below.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Unsatisfiable core pruning}
@@ -118,6 +118,6 @@ After collecting the weakest predicates for our function~$f$, we are prepared fo
 \end{algorithm}
 
 
-Our algorithm is parametric in the minimal number~$X$ and percentage~$K$ of predicate occurences. By changing these parameters, we can~(to some degree) control the precision and recall of our contract mining. If $K \rightarrow 1$, the balance is shifted towards precision, as we consider a condition to be a contract only if it is encountered very frequently w.r.t. function calls. In the opposite case of $K \rightarrow 0$, we greatly increase the recall of our approach, but the probability of mining an erroneous contract is also higher~(as we might capture a programmer's error as a required precondition). Parameter~$X$ has similar properties, but in the space of absolute~(versus relative) values of the number of occurences.
+Our algorithm is parametric in the minimal number~$X$ and percentage~$K$ of predicate occurrences. By changing these parameters, we can~(to some degree) control the precision and recall of our contract mining. If $K \rightarrow 1$, the balance is shifted towards precision, as we consider a condition to be a contract only if it is encountered very frequently w.r.t. function calls. In the opposite case of $K \rightarrow 0$, we greatly increase the recall of our approach, but the probability of mining an erroneous contract is also higher~(as we might capture a programmer's error as a required precondition). Parameter~$X$ has similar properties but in the space of absolute~(versus relative) values of the number of occurrences.
 
 To get the optimal results, one needs to find a good balance between these two parameters. However, at the moment we consider this problem as our future work.
